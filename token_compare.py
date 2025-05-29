@@ -46,10 +46,21 @@ def count_hyperclova_tokens(prompt: str):
         print("[ERROR] HyperCLOVA token error:", str(e))
         return -1
 
-# Tiktoken 패키지를 이용하여 OpenAI GPT 모델의 토큰 수를 계산
-def count_openai_tokens(prompt: str):
+# Tiktoken 패키지를 이용하여 OpenAI GPT-4o 모델의 토큰 수를 계산
+def count_openai_gpt4o_tokens(prompt: str):
     try:
         encoding = tiktoken.encoding_for_model("gpt-4o")
+        tokens = encoding.encode(prompt)
+        print("[DEBUG] GPT-4o tokens:", len(tokens))
+        return len(tokens)
+    except Exception as e:
+        print("[ERROR] GPT-4o token error:", str(e))
+        return -1
+    
+# Tiktoken 패키지를 이용하여 OpenAI GPT-4 모델의 토큰 수를 계산
+def count_openai_gpt4_tokens(prompt: str):
+    try:
+        encoding = tiktoken.encoding_for_model("gpt-4")
         tokens = encoding.encode(prompt)
         print("[DEBUG] GPT-4 tokens:", len(tokens))
         return len(tokens)
@@ -102,12 +113,19 @@ def count_llama_tokens(prompt: str):
 def get_token_counts(prompt: str):
     counts = {
         "hyperclova": count_hyperclova_tokens(prompt),
-        "gpt-4": count_openai_tokens(prompt),
+        "gpt-4o": count_openai_gpt4o_tokens(prompt),
+        "gpt-4": count_openai_gpt4_tokens(prompt),
         "claude": count_claude_tokens(prompt),
         "gemini": count_gemini_tokens(prompt),
         "llama": count_llama_tokens(prompt)
     }
-    print("[DEBUG] All token counts:", counts)
+    base = counts["hyperclova"]
+    if base > 0:
+        percentages = {k: round((v / base) * 100, 2) if v >= 0 else -1 for k, v in counts.items()}
+    else:
+        percentages = {k: -1 for k in counts}
+    counts["percentages"] = percentages
+    print("[DEBUG] Token counts with percentages:", counts)
     return counts
 
 if __name__ == "__main__":
