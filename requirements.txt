@@ -4,3 +4,4 @@ transformers
 anthropic
 google-generativeai
 google-auth
+flask
