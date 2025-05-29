@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>토큰 계산기</title>
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/gh/moonspam/NanumSquareNeo@1.0/nanumsquareneo.css">
+    <style>
+        * {
+            font-family: 'NanumSquareNeo', sans-serif !important;
+        }
+        body {
+            font-family: 'NanumSquareNeo', sans-serif !important;
+            max-width: 720px;
+            margin: 60px auto;
+            padding: 30px;
+            background-color: #f9fafb;
+            color: #333;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+        }
+        h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+            color: #222;
+        }
+        p {
+            font-size: 16px;
+            margin-bottom: 20px;
+        }
+        textarea {
+            width: 100%;
+            height: 180px;
+            margin-bottom: 20px;
+            font-size: 15px;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            resize: vertical;
+            box-sizing: border-box;
+            font-family: 'NanumSquareNeo', sans-serif !important;
+        }
+        button {
+            background-color: #2563eb;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            line-height: normal;
+            height: 38px;
+            vertical-align: middle;
+            margin-left: 10px;
+            font-family: 'NanumSquareNeo', sans-serif !important;
+        }
+        button:first-of-type {
+            margin-left: 0;
+        }
+        button:hover {
+            background-color: #1e40af;
+        }
+        .result {
+            margin-top: 30px;
+            background-color: #eef2f7;
+            padding: 16px;
+            border-radius: 8px;
+            font-size: 15px;
+            line-height: 1.6;
+            white-space: pre-line;
+            min-height: 60px;
+            font-family: 'NanumSquareNeo', sans-serif !important;
+        }
+    </style>
+    <style>
+        .spinner {
+            display: inline-block;
+            width: 22px;
+            height: 22px;
+            border: 3px solid rgba(0, 0, 0, 0.2);
+            border-top: 3px solid #2563eb;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-left: 0;
+            margin-right: 10px;
+            vertical-align: middle;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <h1>토큰 계산기</h1>
+    <p>아래에 텍스트를 입력하면 다양한 LLM의 토큰 수를 계산합니다:</p>
+    <textarea id="inputText" placeholder="프롬프트나 텍스트를 여기에 입력하세요..."></textarea>
+    <button onclick="countTokens()">토큰 계산</button>
+    <button onclick="fillExample()" style="background-color: #6b7280;">예제 입력</button>
+    <button onclick="clearText()" style="background-color: #d1d5db; color: #111;">지우기</button>
+    <div class="result" id="result" style="display: none;">
+        <div id="loading" style="display: none;">
+            <span class="spinner"></span> 계산 중...
+        </div>
+    </div>
+
+    <script>
+        async function countTokens() {
+            const inputText = document.getElementById("inputText").value;
+            const resultDiv = document.getElementById("result");
+
+            // Show result box and spinner
+            resultDiv.style.display = "block";
+            resultDiv.innerHTML = `
+                <div id="loading" style="display: flex; align-items: center; justify-content: center; height: 60px;">
+                    <span class="spinner"></span> 계산 중...
+                </div>
+            `;
+
+            try {
+                const response = await fetch("/count", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ text: inputText })
+                });
+
+                const data = await response.json();
+
+                // Render results
+                let html = "<strong>토큰 수:</strong><br/>";
+                const preferredOrder = ["hyperclova", "gpt-4", "claude", "gemini", "llama"];
+                const modelNames = {
+                    "hyperclova": "<strong>CLOVA</strong>",
+                    "gpt-4": "<strong>OpenAI</strong>",
+                    "claude": "<strong>Claude</strong>",
+                    "gemini": "<strong>Gemini</strong>",
+                    "llama": "<strong>LLaMA</strong>"
+                };
+                for (const model of preferredOrder) {
+                    if (data[model] !== undefined) {
+                        html += `${modelNames[model]}: ${data[model]}<br/>`;
+                    }
+                }
+                resultDiv.innerHTML = html;
+
+            } catch (error) {
+                resultDiv.innerHTML = "에러가 발생했습니다. 다시 시도해 주세요.";
+            }
+        }
+
+        function fillExample() {
+            const example = "예시 문장입니다. 이 텍스트는 다양한 모델에서 얼마나 많은 토큰을 사용하는지 확인하기 위해 사용됩니다.";
+            document.getElementById("inputText").value = example;
+            countTokens();
+        }
+
+        function clearText() {
+            document.getElementById("inputText").value = "";
+            const resultDiv = document.getElementById("result");
+            resultDiv.style.display = "none";
+            resultDiv.innerHTML = "";
+        }
+    </script>
+</body>
+</html>
