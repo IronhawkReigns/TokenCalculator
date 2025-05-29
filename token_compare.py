@@ -6,6 +6,7 @@ import tiktoken
 import google.generativeai as genai
 from google.auth.transport.requests import Request
 from google.auth import default
+import re
 
 # config.json에서 API 키 불러오기
 # CLOVA: 클로바 API 키
@@ -108,6 +109,9 @@ def count_llama_tokens(prompt: str):
         print("[ERROR] LLaMA token error:", str(e))
         return -1
 
+def count_korean_characters(prompt: str):
+    korean_chars = re.findall(r'[\uac00-\ud7af]', prompt)  # Matches any Korean character in the Hangul syllabary
+    return len(korean_chars)
 
 # 여러 모델의 토큰 수를 반환하는 함수
 def get_token_counts(prompt: str):
@@ -117,7 +121,8 @@ def get_token_counts(prompt: str):
         "gpt-4": count_openai_gpt4_tokens(prompt),
         "claude": count_claude_tokens(prompt),
         "gemini": count_gemini_tokens(prompt),
-        "llama": count_llama_tokens(prompt)
+        "llama": count_llama_tokens(prompt),
+        "korean_chars": count_korean_characters(prompt)  # Add this line to count Korean characters
     }
     base = counts["hyperclova"]
     if base > 0:
