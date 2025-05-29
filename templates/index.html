@@ -17,15 +17,18 @@
             color: #333;
             border-radius: 12px;
             box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+            text-align: center;
         }
         h1 {
             font-size: 28px;
             margin-bottom: 10px;
             color: #222;
+            text-align: left;
         }
         p {
             font-size: 16px;
             margin-bottom: 20px;
+            text-align: left;
         }
         textarea {
             width: 100%;
@@ -38,6 +41,7 @@
             resize: vertical;
             box-sizing: border-box;
             font-family: 'NanumSquareNeo', sans-serif !important;
+            text-align: left;
         }
         button {
             background-color: #2563eb;
@@ -70,6 +74,20 @@
             white-space: pre-line;
             min-height: 60px;
             font-family: 'NanumSquareNeo', sans-serif !important;
+            text-align: left;
+        }
+        .token-table th {
+            text-align: center;
+            padding: 12px;
+            background-color: #f3f4f6;
+            font-weight: 600;
+        }
+        .token-table td {
+            text-align: center;
+            padding: 10px;
+        }
+        .token-table tr:nth-child(even) {
+            background-color: #f9fafb;
         }
     </style>
     <style>
@@ -94,11 +112,13 @@
 </head>
 <body>
     <h1>토큰 계산기</h1>
-    <p>아래에 텍스트를 입력하면 다음 LLM들의 토큰 수를 계산합니다:</p>
+    <p>아래에 텍스트를 입력하면 다음 LLM 모델들의 토큰 수를 계산합니다.<br></p>
     <textarea id="inputText" placeholder="프롬프트나 텍스트를 여기에 입력하세요..."></textarea>
-    <button onclick="countTokens()">토큰 계산</button>
-    <button onclick="fillExample()" style="background-color: #6b7280;">예제 입력</button>
-    <button onclick="clearText()" style="background-color: #d1d5db; color: #111;">지우기</button>
+    <div style="display: flex; justify-content: center; gap: 12px; margin-bottom: 20px;">
+        <button onclick="countTokens()">토큰 계산</button>
+        <button onclick="fillExample()" style="background-color: #6b7280;">예제 입력</button>
+        <button onclick="clearText()" style="background-color: #d1d5db; color: #111;">지우기</button>
+    </div>
     <div class="result" id="result" style="display: none;">
         <div id="loading" style="display: none;">
             <span class="spinner"></span> 계산 중...
@@ -127,8 +147,10 @@
 
                 const data = await response.json();
 
+                // Calculate word count
+                const wordCount = inputText.trim().split(/\s+/).length;
+
                 // Render results
-                let html = "<strong>토큰 수:</strong><br/>";
                 const modelNames = {
                     "hyperclova": "<strong>HyperCLOVA</strong>",
                     "gpt-4o": "<strong>GPT-4o</strong>",
@@ -138,11 +160,48 @@
                     "llama": "<strong>LLaMA 4</strong>"
                 };
                 const preferredOrder = ["hyperclova", "gpt-4o", "gpt-4", "claude", "gemini", "llama"];
+
+                let html = `
+                    <table class="token-table" style="width: 100%; margin-top: 12px; border-collapse: collapse; table-layout: fixed;">
+                        <thead>
+                            <tr>
+                                <th>모델</th>
+                                <th>토큰 수</th>
+                                <th>CLOVA 대비</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                `;
+
                 for (const model of preferredOrder) {
                     if (data[model] !== undefined) {
-                        html += `${modelNames[model]}: ${data[model]}<br/>`;
+                        let percent = "-";
+                        if (model !== "hyperclova" && data["hyperclova"] > 0) {
+                            percent = Math.round((data[model] / data["hyperclova"]) * 100) + "%";
+                        }
+                        html += `
+                            <tr>
+                                <td>${modelNames[model]}</td>
+                                <td>${data[model]}</td>
+                                <td>${percent}</td>
+                            </tr>
+                        `;
                     }
                 }
+
+                html += `
+                        </tbody>
+                    </table>
+                `;
+
+                html += `<div style="text-align: right; font-size: 14px; margin-top: 8px; color: #374151;">단어 수: ${wordCount.toLocaleString()}</div>`;
+
+                html += `
+                    <div style="text-align: center; margin-top: 6px;">
+                        <button onclick="copyResults()" style="background-color: #10b981;">결과 복사</button>
+                    </div>
+                `;
+
                 resultDiv.innerHTML = html;
 
             } catch (error) {
@@ -162,6 +221,38 @@
             resultDiv.style.display = "none";
             resultDiv.innerHTML = "";
         }
+
+        function copyResults() {
+            const resultDiv = document.getElementById("result");
+            if (resultDiv.innerText.trim() !== "") {
+                const table = resultDiv.querySelector("table");
+                if (!table) return;
+
+                const rows = table.querySelectorAll("tr");
+                const extracted = [];
+
+                for (let row of rows) {
+                    const cols = row.querySelectorAll("th, td");
+                    const rowData = Array.from(cols).map(col => col.innerText.trim());
+                    extracted.push(rowData);
+                }
+
+                // Use fixed column widths for better alignment in clipboard
+                const fixedColWidths = [14, 8, 10]; // Custom fixed widths for Model, Token, Percent
+                const aligned = extracted.map(row =>
+                    row.map((cell, i) => cell.padEnd(fixedColWidths[i])).join(" ")
+                ).join("\n");
+
+                navigator.clipboard.writeText(aligned)
+                    .then(() => alert("결과가 클립보드에 복사되었습니다."))
+                    .catch(err => alert("복사 실패: " + err));
+            }
+        }
     </script>
+</footer>
+  <footer style="margin-top: 40px; padding-top: 20px; border-top: 1px solid #e5e7eb; text-align: center; font-size: 12px; color: #6b7280;">
+      <div style="margin-bottom: 6px;">© 2025 NAVER Cloud | 토큰 계산기</div>
+      <div>문의: <a href="mailto:mistervic03@gmail.com" style="color: #2563eb; text-decoration: none;">mistervic03@gmail.com</a></div>
+  </footer>
 </body>
 </html>
