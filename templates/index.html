@@ -94,7 +94,7 @@
 </head>
 <body>
     <h1>토큰 계산기</h1>
-    <p>아래에 텍스트를 입력하면 다양한 LLM의 토큰 수를 계산합니다:</p>
+    <p>아래에 텍스트를 입력하면 다음 LLM들의 토큰 수를 계산합니다:</p>
     <textarea id="inputText" placeholder="프롬프트나 텍스트를 여기에 입력하세요..."></textarea>
     <button onclick="countTokens()">토큰 계산</button>
     <button onclick="fillExample()" style="background-color: #6b7280;">예제 입력</button>
@@ -129,14 +129,15 @@
 
                 // Render results
                 let html = "<strong>토큰 수:</strong><br/>";
-                const preferredOrder = ["hyperclova", "gpt-4", "claude", "gemini", "llama"];
                 const modelNames = {
-                    "hyperclova": "<strong>CLOVA</strong>",
-                    "gpt-4": "<strong>OpenAI</strong>",
-                    "claude": "<strong>Claude</strong>",
-                    "gemini": "<strong>Gemini</strong>",
-                    "llama": "<strong>LLaMA</strong>"
+                    "hyperclova": "<strong>HyperCLOVA</strong>",
+                    "gpt-4o": "<strong>GPT-4o</strong>",
+                    "gpt-4": "<strong>GPT-4</strong>",
+                    "claude": "<strong>Claude Opus 4</strong>",
+                    "gemini": "<strong>Gemini 2.5</strong>",
+                    "llama": "<strong>LLaMA 4</strong>"
                 };
+                const preferredOrder = ["hyperclova", "gpt-4o", "gpt-4", "claude", "gemini", "llama"];
                 for (const model of preferredOrder) {
                     if (data[model] !== undefined) {
                         html += `${modelNames[model]}: ${data[model]}<br/>`;
