@@ -1,0 +1,7 @@
+tiktoken
+requests
+transformers
+anthropic
+google-generativeai
+google-auth
+flask
