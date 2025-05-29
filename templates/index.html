@@ -149,6 +149,8 @@
 
                 // Calculate word count
                 const wordCount = inputText.trim().split(/\s+/).length;
+                // Calculate Korean character count (한국어 글자 수)
+                const koreanCharCount = inputText.replace(/[^가-힣]/g, '').length;
 
                 // Render results
                 const modelNames = {
@@ -194,7 +196,8 @@
                     </table>
                 `;
 
-                html += `<div style="text-align: right; font-size: 14px; margin-top: 8px; color: #374151;">단어 수: ${wordCount.toLocaleString()}</div>`;
+                html += `<div style="text-align: right; font-size: 14px; margin-top: 8px; color: #374151;">한국어 글자 수: ${koreanCharCount.toLocaleString()}</div>`;
+                html += `<div style="text-align: right; font-size: 14px; margin-top: 2px; color: #374151;">단어 수: ${wordCount.toLocaleString()}</div>`;
 
                 html += `
                     <div style="text-align: center; margin-top: 6px;">
