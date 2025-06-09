@@ -1,6 +1,6 @@
 # LLM Token Comparator
 
-Compare token counts across different Large Language Model (LLM) providers — including OpenAI, Claude, Gemini, LLaMA, and HyperCLOVA — to better understand prompt cost, length, and optimization strategies.
+Compare token counts across different Large Language Model (LLM) providers — including OpenAI, Claude, Gemini, LLaMA, and HyperCLOVA — to better understand prompt cost, length, and optimization strategies. Specifically great in comparing token counts for Korean language, compared to its current leader Naver HyperCLOVA X.
 
 ---
 
