@@ -105,12 +105,6 @@ Want to add a provider? Follow the `/tokenizer/` pattern and open a PR.
 
 ---
 
-## 📜 License
-
-[MIT License](./LICENSE)
-
----
-
 ## 👨‍💻 Author
 
 Built by [YJ Shin](https://github.com/IronhawkReigns)  
