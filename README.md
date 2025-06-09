@@ -80,7 +80,7 @@ llm-token-comparator/
 
 ---
 
-## 📊 Sample Output
+## Sample Output
 
 | Model     | Token Count |
 |-----------|-------------|
@@ -92,20 +92,20 @@ llm-token-comparator/
 
 ---
 
-## 🔒 Disclaimer
+## Disclaimer
 
 This tool is for developer and research use only. Tokenizer logic may differ slightly from official APIs. Always verify against provider documentation for billing-critical cases.
 
 ---
 
-## 🤝 Contributing
+## Contributing
 
 Pull requests and tokenizer plugin contributions are welcome!  
 Want to add a provider? Follow the `/tokenizer/` pattern and open a PR.
 
 ---
 
-## 👨‍💻 Author
+## Author
 
 Built by [YJ Shin](https://github.com/IronhawkReigns)  
 Computer Science student @ Georgia Tech and Naver Cloud intern.
