@@ -34,7 +34,7 @@ Especially useful for analyzing Korean-language tokenization, where HyperCLOVA X
 ### 1. Clone the Repository
 
 <pre>
-git clone https://github.com/your-username/llm-token-comparator.git
+git clone https://github.com/IronhawkReigns/TokenCalculator.git
 cd llm-token-comparator
 </pre>
 
