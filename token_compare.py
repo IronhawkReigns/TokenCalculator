@@ -70,83 +70,18 @@ def count_openai_gpt4_tokens(prompt: str):
         return -1
 
 # 공식 토큰 계산 API를 이용하여 Anthropic Claude 모델의 토큰 수를 계산
-def count_claude_tokens(prompt: str):
-    import anthropic
-    
-    print(f"[DEBUG] Attempting to count tokens for prompt: '{prompt[:50]}...'")
-    
-    # Check if API key exists
-    if "CLAUDE_API_KEY" not in config:
-        print("[ERROR] CLAUDE_API_KEY not found in config")
-        return -1
-    
-    api_key = config["CLAUDE_API_KEY"]
-    if not api_key or api_key.strip() == "":
-        print("[ERROR] CLAUDE_API_KEY is empty")
-        return -1
-    
-    print(f"[DEBUG] API key found: {api_key[:10]}...")
-    
-    try:
-        client = anthropic.Anthropic(api_key=api_key)
-        print("[DEBUG] Anthropic client created successfully")
-        
-        # Try the beta token counting API first
-        try:
-            print("[DEBUG] Attempting beta token counting API...")
-            response = client.beta.messages.count_tokens(
-                betas=["token-counting-2024-11-01"],
-                model="claude-3-5-sonnet-20241022",  # Using a more standard model
-                messages=[{"role": "user", "content": prompt}]
-            )
-            print(f"[DEBUG] Beta API successful. Response: {response}")
-            if hasattr(response, 'input_tokens'):
-                tokens = response.input_tokens
-                print(f"[DEBUG] Claude tokens (beta): {tokens}")
-                return tokens
-            else:
-                print(f"[ERROR] Unexpected response format: {response}")
-                return -1
-                
-        except Exception as beta_error:
-            print(f"[DEBUG] Beta API failed: {beta_error}")
-            print("[DEBUG] Trying regular token counting API...")
-            
-            # Fallback to regular API
-            try:
-                response = client.messages.count_tokens(
-                    model="claude-3-5-sonnet-20241022",
-                    messages=[{"role": "user", "content": prompt}]
-                )
-                print(f"[DEBUG] Regular API successful. Response: {response}")
-                if hasattr(response, 'input_tokens'):
-                    tokens = response.input_tokens
-                    print(f"[DEBUG] Claude tokens (regular): {tokens}")
-                    return tokens
-                else:
-                    print(f"[ERROR] Unexpected response format: {response}")
-                    return -1
-                    
-            except Exception as regular_error:
-                print(f"[ERROR] Regular API also failed: {regular_error}")
-                raise regular_error
-                
-    except Exception as e:
-        print(f"[ERROR] Claude token error details:")
-        print(f"  Error type: {type(e).__name__}")
-        print(f"  Error message: {str(e)}")
-        
-        # Check for specific error types
-        if "authentication" in str(e).lower() or "api_key" in str(e).lower():
-            print("  -> This appears to be an API key authentication issue")
-        elif "rate_limit" in str(e).lower() or "quota" in str(e).lower():
-            print("  -> This appears to be a rate limiting issue")
-        elif "model" in str(e).lower():
-            print("  -> This appears to be a model availability issue")
-        elif "network" in str(e).lower() or "connection" in str(e).lower():
-            print("  -> This appears to be a network connectivity issue")
-        
-        return -1
+import anthropic
+
+client = anthropic.Anthropic(api_key="CLAUDE_API_KEY")
+
+response = client.messages.count_tokens(
+    model="claude-3-opus-20240229",
+    messages=[
+        {"role": "user", "content": "Hello, how are you today?"}
+    ]
+)
+
+print(f"Input tokens: {response.input_tokens}")
 
 # 공식 토큰 계산 API를 이용하여 Google Gemini 모델의 토큰 수를 계산
 def count_gemini_tokens(prompt: str):
