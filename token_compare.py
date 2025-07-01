@@ -74,7 +74,7 @@ def count_claude_tokens(prompt: str):
     import anthropic
 
     api_key = config["CLAUDE_API_KEY"] 
-    client = anthropic.Anthropic(api_key)
+    client = anthropic.Anthropic(api_key=api_key)
 
     response = client.messages.count_tokens(
         model="claude-3-opus-20240229",
