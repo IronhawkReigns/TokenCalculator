@@ -73,10 +73,11 @@ def count_openai_gpt4_tokens(prompt: str):
 def count_claude_tokens(prompt: str):
     import anthropic
 
-    client = anthropic.Anthropic(api_key=["CLAUDE_API_KEY"]) # Replace with your actual API key
+    api_key = config["CLAUDE_API_KEY"] 
+    client = anthropic.Anthropic(api_key)
 
     response = client.messages.count_tokens(
-        model="claude-3-opus-20240229", # Or other supported models like claude-3-sonnet-20240229, claude-3-haiku-20240229, etc.
+        model="claude-3-opus-20240229",
         messages=[
             {"role": "user", "content": "Hello, how are you today?"}
         ]
