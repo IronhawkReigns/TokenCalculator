@@ -73,17 +73,59 @@ def count_openai_gpt4_tokens(prompt: str):
 def count_claude_tokens(prompt: str):
     import anthropic
 
-    api_key = config["CLAUDE_API_KEY"] 
-    client = anthropic.Anthropic(api_key=api_key)
-
-    response = client.messages.count_tokens(
-        model="claude-3-opus-20240229",
-        messages=[
-            {"role": "user", "content": "Hello, how are you today?"}
-        ]
-    )
-
-    print(f"Input tokens: {response.input_tokens}")
+    print("[DEBUG] Starting Claude token count...")
+    
+    # Check if config has the key
+    if "CLAUDE_API_KEY" not in config:
+        print("[ERROR] CLAUDE_API_KEY not found in config keys:", list(config.keys()))
+        return -1
+    
+    api_key = config["CLAUDE_API_KEY"]
+    
+    # Debug the key
+    print(f"[DEBUG] API key type: {type(api_key)}")
+    print(f"[DEBUG] API key length: {len(api_key) if api_key else 'None'}")
+    print(f"[DEBUG] API key starts with: {api_key[:15] if api_key else 'None'}...")
+    print(f"[DEBUG] API key ends with: ...{api_key[-10:] if api_key else 'None'}")
+    
+    # Check for common issues
+    if not api_key:
+        print("[ERROR] API key is None or empty")
+        return -1
+    
+    if not isinstance(api_key, str):
+        print(f"[ERROR] API key is not a string, it's: {type(api_key)}")
+        return -1
+    
+    if not api_key.startswith("sk-ant-api03-"):
+        print(f"[ERROR] API key doesn't start with 'sk-ant-api03-', starts with: {api_key[:15]}")
+        return -1
+    
+    # Check for whitespace issues
+    if api_key != api_key.strip():
+        print("[WARNING] API key has leading/trailing whitespace")
+        api_key = api_key.strip()
+    
+    try:
+        print("[DEBUG] Creating Anthropic client...")
+        client = anthropic.Anthropic(api_key=api_key)
+        
+        print("[DEBUG] Calling count_tokens API...")
+        response = client.messages.count_tokens(
+            model="claude-3-5-sonnet-20241022",
+            messages=[{"role": "user", "content": prompt}]
+        )
+        
+        print(f"[DEBUG] Success! Claude tokens: {response.input_tokens}")
+        return response.input_tokens
+        
+    except anthropic.AuthenticationError as auth_err:
+        print(f"[ERROR] Authentication error: {auth_err}")
+        print(f"[ERROR] This means the API key is invalid or expired")
+        return -1
+    except Exception as e:
+        print(f"[ERROR] Other error: {type(e).__name__}: {str(e)}")
+        return -1
 
 
 # 공식 토큰 계산 API를 이용하여 Google Gemini 모델의 토큰 수를 계산
