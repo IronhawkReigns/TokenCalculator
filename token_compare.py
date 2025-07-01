@@ -72,7 +72,7 @@ def count_openai_gpt4_tokens(prompt: str):
 # 공식 토큰 계산 API를 이용하여 Anthropic Claude 모델의 토큰 수를 계산
 import anthropic
 
-client = anthropic.Anthropic(api_key="CLAUDE_API_KEY")
+client = anthropic.Anthropic(api_key=["CLAUDE_API_KEY"])
 
 response = client.messages.count_tokens(
     model="claude-3-opus-20240229",
