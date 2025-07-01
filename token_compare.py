@@ -77,7 +77,7 @@ def count_claude_tokens(prompt: str):
     try:
         response = client.beta.messages.count_tokens(
             betas=["token-counting-2024-11-01"],  # Required beta header
-            model="claude-opus-4-20250514",
+            model="claude-3-5-sonnet-20241022",
             messages=[{"role": "user", "content": prompt}]
         )
         print("[DEBUG] Claude tokens:", response.input_tokens)
