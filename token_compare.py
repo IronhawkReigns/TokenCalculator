@@ -75,7 +75,8 @@ def count_claude_tokens(prompt: str):
 
     client = anthropic.Anthropic(api_key=config["CLAUDE_API_KEY"])
     try:
-        response = client.messages.count_tokens(
+        response = client.beta.messages.count_tokens(
+            betas=["token-counting-2024-11-01"],  # Required beta header
             model="claude-opus-4-20250514",
             messages=[{"role": "user", "content": prompt}]
         )
@@ -132,8 +133,3 @@ def get_token_counts(prompt: str):
     counts["percentages"] = percentages
     print("[DEBUG] Token counts with percentages:", counts)
     return counts
-
-if __name__ == "__main__":
-    prompt = "Hello, this is crazy. Damn"
-    result = get_token_counts(prompt)
-    print("Token Counts:", result)
