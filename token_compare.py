@@ -152,6 +152,20 @@ def count_llama_tokens(prompt: str):
         print("[ERROR] LLaMA token error:", str(e))
         return -1
 
+# Transformers 라이브러리를 이용하여 QWEN 모델의 토큰 수를 계산
+def count_qwen_tokens(prompt: str):
+    from transformers import AutoTokenizer
+    try:
+        # Use Qwen2.5-7B-Instruct as the reference model
+        tokenizer = AutoTokenizer.from_pretrained("Qwen/Qwen2.5-7B-Instruct")
+        tokens = tokenizer.encode(prompt)
+        count = len(tokens)
+        print("[DEBUG] Qwen 2.5 tokens:", count)
+        return count
+    except Exception as e:
+        print("[ERROR] Qwen 2.5 token error:", str(e))
+        return -1
+
 def count_korean_characters(prompt: str):
     korean_chars = re.findall(r'[\uac00-\ud7af]', prompt)  # Matches any Korean character in the Hangul syllabary
     return len(korean_chars)
@@ -165,7 +179,8 @@ def get_token_counts(prompt: str):
         "claude": count_claude_tokens(prompt),
         "gemini": count_gemini_tokens(prompt),
         "llama": count_llama_tokens(prompt),
-        "korean_chars": count_korean_characters(prompt)  # Add this line to count Korean characters
+        "qwen": count_qwen_tokens(prompt),  # Add this line
+        "korean_chars": count_korean_characters(prompt)
     }
     base = counts["hyperclova"]
     if base > 0:
